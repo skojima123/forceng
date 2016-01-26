@@ -304,12 +304,14 @@ angular.module('forceng', [])
      *  params:  queryString parameters as a map - Optional
      *  data:  JSON object to send in the request body - Optional
      */
-    function request(obj) {
+    function request(obj, deferred) {
 
       var method = obj.method || 'GET',
         headers = {},
-        url = getRequestBaseURL(),
-        deferred = $q.defer();
+        url = getRequestBaseURL()
+      if (deferred === undefined){
+        var  deferred = $q.defer();
+      }
 
       if (!oauth || (!oauth.access_token && !oauth.refresh_token)) {
         deferred.reject('No access token. Login and try again.');
@@ -346,7 +348,7 @@ angular.module('forceng', [])
             refreshToken()
               .success(function () {
                 // Try again with the new token
-                request(obj);
+                request(obj, deferred);
               })
               .error(function () {
                 console.error(data);
